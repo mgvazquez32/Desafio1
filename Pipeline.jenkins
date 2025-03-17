@@ -1,0 +1,72 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'nombre', defaultValue: '', description: 'Ingresa nombre y apellido del usuario:')
+        choice(name: 'depto', choices: ['Tesoreria', 'Finanzas', 'Tecnologia'], description: 'Seleccione un departamento')
+        string(name: 'login', defaultValue: '', description: 'Ingresa un login para el usuario')
+        choice(name: 'dominio', choices: ['fedora.com', 'ubuntu.com.ar', 'gmail.com'], description: 'Seleccione un dominio de correo')
+    }
+    environment {
+        USER_EMAIL = "${params.login}@${params.dominio}"  // Crea el correo electrónico segun el login
+    }
+    stages {
+        stage('Verificar OpenSSL') {
+            steps {
+                script {
+                        sh 'openssl version'
+                }
+            }
+        }
+        stage('Crear Grupos') {
+            steps {
+                script {
+                    // Crear los grupos 'Contabilidad', 'Finanzas' y 'Tecnologia' si no existen
+                    sh """
+                    sudo groupadd -f Contabilidad
+                    sudo groupadd -f Tecnologia
+                    sudo groupadd -f Finanzas  
+                    """
+                }
+            }
+        }
+        stage('Generar Contraseña Temporal') {
+            steps {
+                script {
+                    // Verificar la salida del comando openssl
+                    def generatedPassword = sh(script: 'openssl rand -base64 12', returnStdout: true).trim()
+                    echo "Salida de openssl: ${generatedPassword}"
+                    
+                    // Asignar la contraseña temporal solo si no está vacía
+                    if (generatedPassword) {
+                        env.TEMP_PASSWORD = generatedPassword
+                        echo "Contraseña temporal generada: ${env.TEMP_PASSWORD}"
+                    } else {
+                        error "No se pudo generar la contraseña temporal."
+                    }
+                }
+            }
+        }
+        stage('Crear Usuario en Linux') {
+            steps {
+                script {
+                    // Verificar que el login y la contraseña estén definidos correctamente
+                    echo "Creando usuario: ${params.login} con contraseña temporal: ${env.TEMP_PASSWORD}"
+                    
+                    // Crear el usuario en el sistema y asignarlo al grupo
+                    sh """
+                    sudo useradd -m -G ${params.depto} -s /bin/bash ${params.login}
+                    echo '${params.login}:${env.TEMP_PASSWORD}' | sudo chpasswd
+                    sudo chage -d 0 ${params.login}  # Obligamos al usuario a cambiar la contraseña en el primer inicio
+                    """
+                }
+            }
+       
+        }
+        stage('Imprimir') {
+    steps {
+        echo "Login: ${params.login}. Password: ${env.TEMP_PASSWORD}. Mail: ${params.login}@${params.dominio}"
+             }
+        }
+
+    }
+}
