@@ -34,7 +34,6 @@ pipeline {
                 script {
                     // Verificar la salida del comando openssl
                     def generatedPassword = sh(script: 'openssl rand -base64 12', returnStdout: true).trim()
-                    echo "Salida de openssl: ${generatedPassword}"
                     
                     // Asignar la contraseña temporal solo si no está vacía
                     if (generatedPassword) {
@@ -50,7 +49,7 @@ pipeline {
             steps {
                 script {
                     // Verificar que el login y la contraseña estén definidos correctamente
-                    echo "Creando usuario: ${params.login} con contraseña temporal: ${env.TEMP_PASSWORD}"
+                    echo "Creando usuario: ${params.login}"
                     
                     // Crear el usuario en el sistema y asignarlo al grupo
                     sh """
