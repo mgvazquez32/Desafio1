@@ -48,10 +48,10 @@ pipeline {
         stage('Crear Usuario en Linux') {
             steps {
                 script {
-                    // Verificar que el login y la contraseña estén definidos correctamente
+                    
                     echo "Creando usuario: ${params.login}"
                     
-                    // Crear el usuario en el sistema y asignarlo al grupo
+                    // Crea el usuario en el sistema y asigna al grupo
                     sh """
                     sudo useradd -m -G ${params.depto} -s /bin/bash ${params.login}
                     echo '${params.login}:${env.TEMP_PASSWORD}' | sudo chpasswd
