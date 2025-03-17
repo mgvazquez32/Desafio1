@@ -1,0 +1,71 @@
+Lanzada por el usuario Matias G Vazquez
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins  in /var/lib/jenkins/workspace/Desafio1
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Verificar OpenSSL)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ openssl version
+OpenSSL 3.3.1 4 Jun 2024 (Library: OpenSSL 3.3.1 4 Jun 2024)
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Crear Grupos)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ sudo groupadd -f Contabilidad
++ sudo groupadd -f Tecnologia
++ sudo groupadd -f Finanzas
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Generar Contraseña Temporal)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ openssl rand -base64 12
+[Pipeline] echo
+Salida de openssl: 76WMl9MXIzfRimsx
+[Pipeline] echo
+Contraseña temporal generada: 76WMl9MXIzfRimsx
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Crear Usuario en Linux)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] echo
+Creando usuario: cflores con contraseña temporal: 76WMl9MXIzfRimsx
+[Pipeline] sh
++ sudo useradd -m -G Tecnologia -s /bin/bash cflores
++ echo cflores:76WMl9MXIzfRimsx
++ sudo chpasswd
++ sudo chage -d 0 cflores
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Imprimir)
+[Pipeline] echo
+Login: cflores. Password: 76WMl9MXIzfRimsx. Mail: cflores@ubuntu.com.ar
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
